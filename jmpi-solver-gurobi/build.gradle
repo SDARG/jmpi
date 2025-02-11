@@ -1,0 +1,5 @@
+dependencies {
+	implementation files('libs/gurobi.jar')
+	api project(':jmpi-main')
+	testImplementation group: 'junit', name: 'junit', version: '[4.0,)'
+}

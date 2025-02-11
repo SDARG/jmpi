@@ -1,0 +1,129 @@
+plugins{
+	id 'base'
+	id 'java'
+	id 'java-library'
+	id 'eclipse'
+	id 'application'
+}
+
+version = '0.6'
+
+def stagingURL = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+def snapshotURL = 'https://oss.sonatype.org/content/repositories/snapshots/'
+
+def descriptions = [
+	'jmpi-main' : 'The core module of JMPI', 
+	'jmpi-solver-cplex' : 'The solver interface for CPLEX',
+	'jmpi-solver-gurobi' : 'The solver interface for GUROBI', 
+	'jmpi-solver-mosek' : 'The solver interface for Mosek',
+	'jmpi-solver-sat4j' : 'The solver interface for SAT4J', 
+	'jmpi-solver-xpress' : 'The solver interface for Xpress',
+]
+
+allprojects {
+    group = 'net.sf.jmpi'
+    
+    repositories {
+    	mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+	apply plugin: 'eclipse'
+    apply plugin: 'signing'
+	
+	sourceCompatibility = 1.6 
+	targetCompatibility = 1.6
+    
+    version = parent.version
+	
+	task sourcesJar(type: Jar, dependsOn:classes) {
+		from sourceSets.main.allSource 
+		archiveClassifier.set('sources')
+	} 
+
+	task javadocJar(type: Jar, dependsOn:javadoc) {
+		from javadoc.destinationDir 
+		archiveClassifier.set('javadoc')
+	}
+
+	artifacts { 
+		archives jar
+		archives sourcesJar 
+		archives javadocJar 
+	}
+
+	signing {
+	    sign configurations.archives
+	}
+	/*
+	uploadArchives {
+	    repositories {
+	        mavenDeployer {
+	            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+	 
+	            repository(url: stagingURL) {
+	              authentication(userName: sonatypeUsername, password: sonatypePassword)
+	            }
+	 
+	            pom.project {
+	               name 'JMPI'
+	               packaging 'jar'
+	               description descriptions[project.name]
+	               url 'http://jmpi.sf.net'
+	 
+	               scm {
+	                   url 'http://hg.code.sf.net/p/jmpi/hgroot'
+	                   connection 'http://hg.code.sf.net/p/jmpi/hgroot'
+	               }
+	 
+	               licenses {
+	                   license {
+	                       name 'GNU Lesser General Public License'
+	                       url 'http://www.gnu.org/licenses/lgpl.txt'
+	                       distribution 'repo'
+	                   }
+	               }
+	 
+	               developers {
+	                   developer {
+	                       id 'lukasiewycz'
+	                       name 'Martin Lukasiewycz'
+	                   }
+	               }
+	           }
+	        }
+	    }
+	}*/
+}
+
+/* for now ignore all javadoc errors in case of Java 8 */
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+		tasks.withType(Javadoc) {
+			options.addStringOption('Xdoclint:none', '-quiet')
+		}
+    }
+}
+
+ext {
+	dateISO = new Date().format("yyyy-MM-dd")
+}
+
+
+
+/*uploadArchives.doFirst {
+	println "Sonatype Username: "+sonatypeUsername 
+	println "Private Key: "+project.ext.get("signing.secretKeyRingFile")
+	println "Private Key ID: "+project.ext.get("signing.keyId")
+}*/
+
+task website(type: Copy){
+	from('src/main/website/') {
+		include '**/*.html'
+	}
+	into 'build/website/'
+}
+

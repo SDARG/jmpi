@@ -1,0 +1,6 @@
+include 'jmpi-main'
+include 'jmpi-solver-gurobi'
+include 'jmpi-solver-cplex'
+include 'jmpi-solver-xpress'
+include 'jmpi-solver-mosek'
+include 'jmpi-solver-sat4j'

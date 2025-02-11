@@ -1,0 +1,8 @@
+dependencies {
+	api project(':jmpi-main')
+	
+	api group: 'org.ow2.sat4j', name: 'org.ow2.sat4j.core', version: '2.3.5'
+	api group: 'org.ow2.sat4j', name: 'org.ow2.sat4j.pb', 	version: '2.3.5'
+
+	testImplementation group: 'junit', name: 'junit', version: '[4.0,)'
+}

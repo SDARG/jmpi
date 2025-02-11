@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+		<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+		<title>JMPI - Java Mathematical Programming Interface</title>
+	</head>
+	
+	<body>
+		<h1>JMPI - Java Mathematical Programming Interface</h1>
+		<hr>
+		<h2>Links</h2>
+			<ul>
+				<!--<li><a href="http://jmpi.sourceforge.net/javadoc/index.html">Java API Reference</a></li>-->
+				<li><a href="https://sourceforge.net/projects/jmpi">Project at Sourceforge.net</a></li>
+			</ul>
+		<hr>
+		
+		<h2>Introduction</h2>
+		<p>
+		JMPI (speak: jumpy) is a Java interface to mathematical programming solvers for Integer Linear Programming and Quadratic Programming.
+		</p>
+		<p>
+		JMPI is open source under MIT license.
+		</p>
+		<p>
+		JMPI requires Java 6 or higher.
+		</p>
+		
+		<h2>Supported Solvers</h2>
+		<ul>
+			<li><b>CPLEX</b> - commercial, limited trial version available at <a href="http://www.ilog.com/products/cplex/">http://www.ilog.com/products/cplex/</a></li>
+			<li><b>Gurobi</b> (contribution by Fabio Genoese)- commercial, free academic version available <a href="http://www.gurobi.com/">http://www.gurobi.com/</a></li>
+			<li><b>Mosek</b> - commercial, limited trial version available at <a href="http://www.mosek.com/">http://www.mosek.com/</a></li>
+			<li><b>Xpress</b> - commercial <a href="http://www.solver.com/xpress-solver-engine">http://www.solver.com/xpress-solver-engine</a></li>
+			<li><b>SAT4J</b> (restricted 0-1 ILP backtracking solver to binary variables and integer coefficients) - free under LGPL license, available at <a href="http://sat4j.org/">http://sat4j.org/</a></li>
+		</ul>
+		<p>
+		You will need the solver specific JNI <em>jar</em> file and the system dependent libraries which are <em>dll</em> files on windows and <em>so</em> files on linux.
+		The <em>jar</em> files have to be on the classpath and the libraries in the library path.
+		</p>
+		<ul>
+			<li>Information about setting the classpath: <a href="http://en.wikipedia.org/wiki/Classpath_%28Java%29">http://en.wikipedia.org/wiki/Classpath_(Java)</a></li>
+			<li>Information about JNI and setting the library path: <a href="http://en.wikipedia.org/wiki/Java_Native_Interface">http://en.wikipedia.org/wiki/Java_Native_Interface</a> (alternatively, copy the <em>dll</em> files to the windows/system32 folder)</li>
+		</ul>
+		<h2>Code example</h2>
+		
+		<div style="font-family:courier">
+			import static net.sf.jmpi.main.expression.MpExpr.prod;<br>
+			import static net.sf.jmpi.main.expression.MpExpr.sum;<br>
+			...<br>
+			MpSolver solver = new SolverGurobi();<br>
+			<br>
+			/**<br>
+			 * Constructing a Problem: <br>
+			 * Maximize: 143x+60y <br>
+			 * Subject to: <br>
+			 * 120x+210y &lt;= 15000 <br>
+			 * 110x+30y &lt;= 4000 <br>
+			 * x+y &lt;= 75<br>
+			 * <br>
+			 * With x,y being integers<br>
+			 * <br>
+			 */<br>
+			 <br>
+			MpProblem problem = new MpProblem();<br>
+			problem.addVar("x", Integer.class);<br>
+			problem.addVar("y", Integer.class);<br>
+<br>
+			MpExpr objective = sum(prod(143, "x"), prod(60, "y"));<br>
+			problem.setObjective(objective, MpDirection.MAX);<br>
+<br>
+			problem.add(sum(prod(100, "x"), prod(20, "x"), prod(210, "y")), "&lt;=", 15000);<br>
+			problem.add(sum(prod(110, "x"), prod(30, "y")), "&lt;=", 4000);<br>
+			problem.add(sum("x"), "&lt;=", sum(75, prod(-1, "y")));<br>
+<br>
+			solver.add(problem);<br>
+<br>
+			MpResult result = solver.solve();<br>
+			System.out.println(result);<br>
+		</div>
+		<p>Results in the following output:</p>
+		<div style="font-family:courier">
+			Objective: 6266.0 {y=52.0, x=22.0}<br>
+		</div>
+		<h2>Documentation</h2>
+		<p>Read the <a href="http://javailp.sourceforge.net/javadoc/index.html">Java API Reference</a>.</p>
+
+		<hr>
+		Copyright 2014, Martin Lukasiewycz
+	
+</body></html>
